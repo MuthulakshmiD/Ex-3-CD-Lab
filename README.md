@@ -64,11 +64,12 @@ int main() {
 
 ```
 # COMMAND:
+```
 lex exec.l 
 yacc -d exec.y
 gcc lex.yy.c y.tab.c -o parser
 ./parser
-
+```
 # OUTPUT
 ![image](https://github.com/user-attachments/assets/9f45f49f-17dd-432a-869c-ec4b3e0e9ff1)
 
