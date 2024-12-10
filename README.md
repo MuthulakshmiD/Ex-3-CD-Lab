@@ -12,59 +12,63 @@ To write a yacc program to recognize a valid arithmetic expression that uses ope
 7.	Compile these with the C compiler as gcc lex.yy.c y.tab.c
 8.	Enter an arithmetic expression as input and the tokens are identified as output.
 # PROGRAM
-# ex3.1
+# EXEC.L
 ```
 %{
-/* This LEX program returns the tokens for the expression */
 #include "y.tab.h"
 %}
+
 %%
-"=" {printf("\n Operator is EQUAL");}
-"+" {printf("\n Operator is PLUS");}
-"-" {printf("\n Operator is MINUS");}
-"/" {printf("\n Operator is DIVISION");}
-"*" {printf("\n Operator is MULTIPLICATION");}
-[a-zA-Z]*[0-9]* {
-printf("\n Identifier is %s",yytext);
-return ID; }
-. return yytext[0];
-\n return 0;
+
+"=" { printf("\n Operator is EQUAL"); return '='; }
+"+" { printf("\n Operator is PLUS"); return PLUS; }
+"-" { printf("\n Operator is MINUS"); return MINUS; }
+"/" { printf("\n Operator is DIVISION"); return DIVISION; }
+"*" { printf("\n Operator is MULTIPLICATION"); return MULTIPLICATION; }
+[a-zA-Z]*[0-9]* { printf("\n Identifier is %s", yytext); return ID; }
+. { return yytext[0]; }
+\n { return 0; }
+
 %%
-int yywrap()
-{
-return 1;
+
+int yywrap() { return 1;
 }
 ```
-# ex3.1
+# EXEC.Y
 ```
 %{
-#include<stdio.h>
-/* This YACC program is for recognizing the Expression */
+#include <stdio.h>
+int yylex(void);
+void yyerror(const char *s);
 %}
-%token A ID
+
+%token ID PLUS MINUS MULTIPLICATION DIVISION
+
 %%
-statement: A'='E
-| E {
-printf("\n Valid arithmetic expression");
-$$=$1;
-}
+statement: ID '=' expression { printf("\nValid arithmetic expression\n"); }
 ;
-E: E'+'ID
-| E'-'ID
-| E'*'ID
-| E'/'ID
-| ID
+
+expression: expression PLUS ID
+          | expression MINUS ID
+          | expression MULTIPLICATION ID
+          | expression DIVISION ID
+          | ID
 ;
 %%
-extern FILE*yyin;
-main() {
-do {
-yyparse();
-}while(!feof(yyin)); }
- yyerror(char*s)
-{
+
+int main() {
+    printf("Enter input: ");
+    yyparse();
+    return 0;
 }
+
 ```
+# COMMAND:
+lex exec.l 
+yacc -d exec.y
+gcc lex.yy.c y.tab.c -o parser
+./parser
+
 # OUTPUT
 ![image](https://github.com/user-attachments/assets/9f45f49f-17dd-432a-869c-ec4b3e0e9ff1)
 
